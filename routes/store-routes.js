@@ -8,4 +8,9 @@ router.get('/', async (req, res) => {
     res.json(stores);
 })
 
+router.post('/', async (req, res) => {
+    const newStore = await Store.create(req.body);
+    res.json(newStore);
+})
+
 module.exports = router;

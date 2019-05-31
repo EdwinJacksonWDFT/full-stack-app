@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
+
+import StoreList from './store-list';
+import AddStoreForm from './add-store-form';
 
 class App extends React.Component {
   state = {
@@ -14,6 +18,24 @@ class App extends React.Component {
     })
   }
 
+  handleSubmit = async event => {
+    event.preventDefault();
+
+    const postConfig = {
+      name: event.target.name.value,
+      location: event.target.location.value,
+      manager: event.target.manager.value,
+      openDate: event.target.openDate.value,
+    }
+
+    const newStore = await axios
+      .post('http://localhost:8080/stores', postConfig)
+
+    this.setState({
+      stores: [...this.state.stores, newStore]
+    });
+  }
+
   render() {
 
     if (!this.state.stores) {
@@ -23,16 +45,17 @@ class App extends React.Component {
     }
 
     return (
-      <div className="App">
-        <h1>Hello Brainstation</h1>
-        {this.state.stores.map(store => (
-          <article>
-            <h2>{store.name}</h2>
-            <p>{store.location}</p>
-            <p>{store.manager}</p>
-          </article>
-        ))}
-      </div>
+      <Router>
+        <Switch>
+          <Route 
+            exact
+            path="/" 
+            render={props => <StoreList stores={this.state.stores} />} />
+          <Route
+            path="/add"
+            render={props => <AddStoreForm submit={this.handleSubmit} />} />
+        </Switch>
+      </Router>
     );
   }
 }
